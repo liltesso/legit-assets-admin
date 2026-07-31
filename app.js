@@ -169,12 +169,6 @@
   let currentSharedConfig = {};
   const exchangeRateInput = el('exchangeRateInput');
   const defaultLangSelect = el('defaultLangSelect');
-  const adminPasswordInput = el('adminPasswordInput');
-
-  async function sha256(text) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-    return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
-  }
 
   async function loadSettings() {
     if (!siteDirHandle) return;
@@ -197,9 +191,6 @@
       exchangeRateUAH: parseFloat(exchangeRateInput.value || '41.5'),
       defaultLang: defaultLangSelect.value,
     });
-    if (adminPasswordInput.value.trim()) {
-      newConfig.adminPasswordHash = await sha256(adminPasswordInput.value.trim());
-    }
     currentSharedConfig = newConfig;
     const json = JSON.stringify(newConfig, null, 2) + '\n';
 
@@ -210,7 +201,6 @@
         const writable = await fh.createWritable();
         await writable.write(json);
         await writable.close();
-        adminPasswordInput.value = '';
         setStatus('Налаштування збережено для всіх 5 сайтів ✅');
         notify('Налаштування збережено локально ✅', 'success');
       } catch (e) {
@@ -220,7 +210,6 @@
       return;
     }
     downloadJson(json, 'shared-config.json');
-    adminPasswordInput.value = '';
     setStatus(`Завантажено shared-config.json — замініть ним файл у ${SHARED_FOLDER}/.`);
   });
 
@@ -291,12 +280,8 @@
       exchangeRateUAH: parseFloat(exchangeRateInput.value || '41.5'),
       defaultLang: defaultLangSelect.value,
     });
-    if (adminPasswordInput.value.trim()) {
-      newConfig.adminPasswordHash = await sha256(adminPasswordInput.value.trim());
-    }
     currentSharedConfig = newConfig;
     const json = JSON.stringify(newConfig, null, 2) + '\n';
-    adminPasswordInput.value = '';
     setStatus('Пушу shared-config.json в GitHub…');
     try {
       await window.LA_GH.putFile('shared-config.json', json, 'Update shared-config.json via admin panel');
