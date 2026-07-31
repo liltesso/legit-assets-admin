@@ -262,6 +262,7 @@
       await window.LA_GH.getFile('shared-config.json');
       ghStatus.textContent = `Підключено до ${cfg.owner}/${cfg.repo}@${cfg.branch} ✅`;
       notify(`GitHub підключено: ${cfg.owner}/${cfg.repo}`, 'success');
+      if (activeCategory) await loadCategoryFromGitHub(activeCategory);
     } catch (e) {
       ghStatus.textContent = 'Помилка доступу: ' + e.message + ' (перевірте токен і права Contents: Read/write)';
       notify('Не вдалося підключити GitHub: ' + e.message, 'error');
@@ -330,6 +331,12 @@
     applyMarkupBtn.disabled = true;
     renderCategoryNav();
 
+    // GitHub takes priority over local files — if connected, load straight
+    // from the repo, no file picker involved at all.
+    if (window.LA_GH.isConfigured()) {
+      await loadCategoryFromGitHub(key);
+      return;
+    }
     if (supportsFS && siteDirHandle) {
       await loadCategory(key);
       return;
@@ -344,7 +351,51 @@
       pendingFallbackCategory = key;
       fallbackFileInput.click();
     } else {
-      setStatus('Спершу підключіть папку legit-shops кнопкою вгорі.');
+      setStatus('Спершу підключіть папку legit-shops кнопкою вгорі, або підключіть GitHub вище.');
+    }
+  }
+
+  async function loadCategoryFromGitHub(key) {
+    const cat = CATEGORIES.find((c) => c.key === key);
+    setStatus(`Завантажую products.json з ${cat.repo}…`);
+    try {
+      const productsFile = await window.LA_GH.getFile('products.json', cat.repo);
+      if (!productsFile) throw new Error('products.json не знайдено в репозиторії');
+      const data = JSON.parse(productsFile.content);
+
+      let meta = null;
+      try {
+        const metaFile = await window.LA_GH.getFile('meta.json', cat.repo);
+        meta = metaFile ? JSON.parse(metaFile.content) : null;
+      } catch (e) { meta = null; }
+
+      let availability = { banner: '', soldOut: [] };
+      try {
+        const availFile = await window.LA_GH.getFile('availability.json', cat.repo);
+        availability = availFile ? JSON.parse(availFile.content) : { banner: '', soldOut: [] };
+      } catch (e) { availability = { banner: '', soldOut: [] }; }
+
+      let pricing = null;
+      if (cat.key === 'proxy') {
+        try {
+          const pricingFile = await window.LA_GH.getFile('pricing.json', cat.repo);
+          pricing = pricingFile ? JSON.parse(pricingFile.content) : null;
+        } catch (e) { pricing = null; }
+      }
+
+      // Reuse the existing "no local file handle" save path (download +
+      // GitHub push) — same as the fallback file-picker mode, just skipping
+      // the file-picker step entirely since we already have the data.
+      sessions[key] = {
+        data, meta, availability, pricing, dirty: false,
+        fallback: true, fallbackName: 'products.json',
+        catDir: null,
+      };
+      setStatus(`Відкрито ${cat.repo}/products.json з GitHub`);
+      renderCategory();
+    } catch (e) {
+      setStatus(`Не вдалося завантажити ${cat.repo} з GitHub: ${e.message}`);
+      notify(`Не вдалося завантажити ${cat.repo}: ${e.message}`, 'error');
     }
   }
 
@@ -411,7 +462,9 @@
 
   reloadBtn.addEventListener('click', () => {
     if (!activeCategory) return;
-    if (supportsFS && siteDirHandle) {
+    if (window.LA_GH.isConfigured()) {
+      loadCategoryFromGitHub(activeCategory);
+    } else if (supportsFS && siteDirHandle) {
       loadCategory(activeCategory);
     } else {
       delete sessions[activeCategory];
