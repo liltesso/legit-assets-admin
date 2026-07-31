@@ -224,24 +224,40 @@
 
   function loadGhConfigIntoForm() {
     const cfg = window.LA_GH.getConfig();
-    ghOwnerInput.value = cfg.owner || '';
-    ghRepoInput.value = cfg.repo || '';
+    ghOwnerInput.value = cfg.owner || 'liltesso';
+    ghRepoInput.value = cfg.repo || 'legit-assets-shared';
     ghBranchInput.value = cfg.branch || 'main';
     ghTokenInput.placeholder = cfg.token ? '•••• (збережено, введіть новий щоб замінити)' : 'github_pat_...';
     ghSaveBtn.disabled = !window.LA_GH.isConfigured() || !activeCategory;
     updateGhBadge();
   }
 
+  // Strips anything outside plain ASCII — a stray smart-quote, non-breaking
+  // space, or invisible character from copy-paste breaks fetch() headers
+  // with a cryptic "non ISO-8859-1 code point" error otherwise.
+  function sanitizeAscii(str) {
+    return (str || '').replace(/[^\x20-\x7E]/g, '').trim();
+  }
+
   el('ghSaveConfigBtn').addEventListener('click', async () => {
     const existing = window.LA_GH.getConfig();
+    const rawToken = ghTokenInput.value.trim() || existing.token || '';
     const cfg = {
-      owner: ghOwnerInput.value.trim(),
-      repo: ghRepoInput.value.trim(),
-      branch: ghBranchInput.value.trim() || 'main',
-      token: ghTokenInput.value.trim() || existing.token || '',
+      owner: sanitizeAscii(ghOwnerInput.value),
+      repo: sanitizeAscii(ghRepoInput.value),
+      branch: sanitizeAscii(ghBranchInput.value) || 'main',
+      token: sanitizeAscii(rawToken),
     };
     if (!cfg.owner || !cfg.repo || !cfg.token) {
       ghStatus.textContent = 'Заповніть власника, репозиторій і токен.';
+      return;
+    }
+    if (cfg.token !== rawToken.trim()) {
+      ghStatus.textContent = 'Токен містив зайві символи — я їх прибрав автоматично, пробую підключитись…';
+    }
+    if (!/^github_pat_[A-Za-z0-9_]+$/.test(cfg.token) && !/^ghp_[A-Za-z0-9]+$/.test(cfg.token)) {
+      ghStatus.textContent = 'Це не схоже на GitHub-токен (має починатись з github_pat_ або ghp_) — перевірте, що скопіювали правильний рядок цілком.';
+      notify('Токен виглядає некоректно — перевірте, що скопійовано правильно', 'error');
       return;
     }
     window.LA_GH.setConfig(cfg);
@@ -261,8 +277,8 @@
 
   el('ghClearConfigBtn').addEventListener('click', () => {
     window.LA_GH.clearConfig();
-    ghOwnerInput.value = '';
-    ghRepoInput.value = '';
+    ghOwnerInput.value = 'liltesso';
+    ghRepoInput.value = 'legit-assets-shared';
     ghBranchInput.value = 'main';
     ghTokenInput.value = '';
     ghTokenInput.placeholder = 'github_pat_...';

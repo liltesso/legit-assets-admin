@@ -58,20 +58,11 @@
         <section id="githubPanel" class="glass-card settings-panel">
           <h2>☁️ GitHub API (редагування без локальних файлів, з будь-якого пристрою)</h2>
           <p class="admin-sub">Токен зберігається лише у цьому браузері (localStorage), ніколи не потрапляє у файли репозиторію.</p>
+          <input id="ghOwnerInput" type="hidden" value="liltesso">
+          <input id="ghRepoInput" type="hidden" value="legit-assets-shared">
+          <input id="ghBranchInput" type="hidden" value="main">
           <label class="settings-field">
-            Власник репозиторіїв (GitHub username/org) — той самий для всіх 6
-            <input id="ghOwnerInput" type="text" placeholder="liltesso">
-          </label>
-          <label class="settings-field">
-            Репозиторій спільних файлів (для shared-config.json)
-            <input id="ghRepoInput" type="text" placeholder="legit-assets-shared" value="legit-assets-shared">
-          </label>
-          <label class="settings-field">
-            Гілка (однакова у всіх 6 репозиторіях)
-            <input id="ghBranchInput" type="text" placeholder="main" value="main">
-          </label>
-          <label class="settings-field">
-            Personal access token (fine-grained, Contents: Read and write)
+            Personal access token — це єдине, що треба вставити (Ctrl+V)
             <input id="ghTokenInput" type="password" placeholder="github_pat_..." autocomplete="off">
           </label>
           <div class="markup-row">
