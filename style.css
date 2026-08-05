@@ -364,9 +364,29 @@
 .item-row {
   padding: 14px 16px;
   display: grid;
-  grid-template-columns: 44px 1.4fr 90px 1.4fr auto auto auto;
+  grid-template-columns: 76px 1.4fr 90px 1.4fr auto auto auto;
   gap: 10px;
   align-items: center;
+}
+
+.col-emoji {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.item-emoji-sticker-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 4px 6px;
+  font-size: 13px;
+  cursor: pointer;
+  background: rgba(255, 215, 0, 0.12);
+  color: #ffd700;
+  flex-shrink: 0;
+}
+.item-emoji-sticker-btn:hover {
+  background: rgba(255, 215, 0, 0.25);
 }
 
 .item-row.selected {
@@ -404,6 +424,8 @@
 .item-row .col-emoji input {
   text-align: center;
   font-size: 18px;
+  width: 38px;
+  flex-shrink: 0;
 }
 
 .item-row .row-id {

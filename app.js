@@ -840,7 +840,10 @@
       const row = document.createElement('div');
       row.className = 'item-row glass-card' + (index === selectedItemIndex ? ' selected' : '');
       row.innerHTML = `
-        <div class="col-emoji"><input type="text" value="${item.emoji || ''}" data-field="emoji" maxlength="4"></div>
+        <div class="col-emoji">
+          <input type="text" value="${item.emoji || ''}" data-field="emoji" maxlength="4">
+          <button class="item-emoji-sticker-btn" type="button" title="Обрати преміум-стікер для іконки товару">✨</button>
+        </div>
         <div class="col-name">
           <input type="text" value="${getText(item, 'name')}" data-field="name" placeholder="Назва (${editLang})">
           <span class="row-id">id: ${item.id}${item.group ? ' · group: ' + item.group : ''}</span>
@@ -953,6 +956,17 @@
           ev.stopPropagation();
           expandedItemIndex = index;
           openEmojiPickerFor('item');
+        });
+      }
+
+      // ✨ біля основної іконки товару (та коробочка з emoji зверху зліва —
+      // напр. 🟠 у крипто-верифікаціях) — окрема ціль від фону-прапора.
+      const itemEmojiStickerBtn = row.querySelector('.item-emoji-sticker-btn');
+      if (itemEmojiStickerBtn) {
+        itemEmojiStickerBtn.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          expandedItemIndex = index;
+          openEmojiPickerFor('itemEmoji');
         });
       }
 
@@ -1128,7 +1142,7 @@
 
   function openEmojiPickerFor(target) {
     if (!emojiPicker) return;
-    if (target === 'item' && expandedItemIndex === null) {
+    if ((target === 'item' || target === 'itemEmoji') && expandedItemIndex === null) {
       notify('Спочатку відкрий ⚙ у товарі, для якого обираєш стікер', 'error');
       return;
     }
@@ -1196,6 +1210,15 @@
     if (expandedItemIndex === null || !activeCategory) return;
     const item = sessions[activeCategory].data.items[expandedItemIndex];
     if (!item) return;
+    if (pickerTarget === 'itemEmoji') {
+      item.emoji = em.char || '';
+      item.emojiImage = em.img || '';
+      markDirty();
+      closeEmojiPicker();
+      renderItems();
+      notify('Іконку товару оновлено — не забудь зберегти', 'success');
+      return;
+    }
     item.flag = em.char || '';
     item.flagImage = em.img || '';
     markDirty();
