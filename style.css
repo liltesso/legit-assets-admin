@@ -191,6 +191,44 @@
   font-size: 15px;
 }
 
+/* Налаштування/GitHub/meta/banner/pricing панелі за замовчуванням згорнуті —
+   інакше сторінку каталогу товарів доводиться довго проскролювати повз них
+   щоразу після вибору категорії. */
+.settings-panel details summary {
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-panel details summary::-webkit-details-marker {
+  display: none;
+}
+
+.settings-panel details summary::before {
+  content: '▸';
+  display: inline-block;
+  color: var(--accent);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.settings-panel details[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.settings-panel details > *:not(summary) {
+  margin-top: 12px;
+}
+
+.settings-panel details[open] {
+  display: flex;
+  flex-direction: column;
+}
+
 .settings-field {
   display: flex;
   flex-direction: column;

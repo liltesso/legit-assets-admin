@@ -32,44 +32,48 @@
 
       <main class="admin-main">
         <section id="settingsPanel" class="glass-card settings-panel">
-          <h2>⚙️ Загальні налаштування (legit-assets-shared/shared-config.json — впливає на всі 5 сайтів)</h2>
-          <label class="settings-field">
-            Username бота (без @)
-            <input id="botUsernameInput" type="text" placeholder="LegitAssetsBot">
-          </label>
-          <label class="settings-field">
-            Курс $ → ₴ (для показу ціни в двох валютах)
-            <input id="exchangeRateInput" type="number" step="0.1" placeholder="41.5">
-          </label>
-          <label class="settings-field">
-            Мова вітрин за замовчуванням
-            <select id="defaultLangSelect">
-              <option value="ru">Русский</option>
-              <option value="uk">Українська</option>
-              <option value="en">English</option>
-            </select>
-          </label>
-          <div class="markup-row">
-            <button id="saveSettingsBtn" class="btn-primary tap-target">💾 Зберегти локально</button>
-            <button id="ghSaveSettingsBtn" class="btn-primary tap-target">☁️ Зберегти в GitHub</button>
-          </div>
+          <details>
+            <summary>⚙️ Загальні налаштування (legit-assets-shared/shared-config.json — впливає на всі 5 сайтів)</summary>
+            <label class="settings-field">
+              Username бота (без @)
+              <input id="botUsernameInput" type="text" placeholder="LegitAssetsBot">
+            </label>
+            <label class="settings-field">
+              Курс $ → ₴ (для показу ціни в двох валютах)
+              <input id="exchangeRateInput" type="number" step="0.1" placeholder="41.5">
+            </label>
+            <label class="settings-field">
+              Мова вітрин за замовчуванням
+              <select id="defaultLangSelect">
+                <option value="ru">Русский</option>
+                <option value="uk">Українська</option>
+                <option value="en">English</option>
+              </select>
+            </label>
+            <div class="markup-row">
+              <button id="saveSettingsBtn" class="btn-primary tap-target">💾 Зберегти локально</button>
+              <button id="ghSaveSettingsBtn" class="btn-primary tap-target">☁️ Зберегти в GitHub</button>
+            </div>
+          </details>
         </section>
 
         <section id="githubPanel" class="glass-card settings-panel">
-          <h2>☁️ GitHub API (редагування без локальних файлів, з будь-якого пристрою)</h2>
-          <p class="admin-sub">Токен зберігається лише у цьому браузері (localStorage), ніколи не потрапляє у файли репозиторію.</p>
-          <input id="ghOwnerInput" type="hidden" value="liltesso">
-          <input id="ghRepoInput" type="hidden" value="legit-assets-shared">
-          <input id="ghBranchInput" type="hidden" value="main">
-          <label class="settings-field">
-            Personal access token — це єдине, що треба вставити (Ctrl+V)
-            <input id="ghTokenInput" type="password" placeholder="github_pat_..." autocomplete="off">
-          </label>
-          <div class="markup-row">
-            <button id="ghSaveConfigBtn" class="btn-primary tap-target">Підключити</button>
-            <button id="ghClearConfigBtn" class="btn-secondary tap-target">Забути токен</button>
-          </div>
-          <p class="admin-status" id="ghStatus"></p>
+          <details>
+            <summary>☁️ GitHub API (редагування без локальних файлів, з будь-якого пристрою)</summary>
+            <p class="admin-sub">Токен зберігається лише у цьому браузері (localStorage), ніколи не потрапляє у файли репозиторію.</p>
+            <input id="ghOwnerInput" type="hidden" value="liltesso">
+            <input id="ghRepoInput" type="hidden" value="legit-assets-shared">
+            <input id="ghBranchInput" type="hidden" value="main">
+            <label class="settings-field">
+              Personal access token — це єдине, що треба вставити (Ctrl+V)
+              <input id="ghTokenInput" type="password" placeholder="github_pat_..." autocomplete="off">
+            </label>
+            <div class="markup-row">
+              <button id="ghSaveConfigBtn" class="btn-primary tap-target">Підключити</button>
+              <button id="ghClearConfigBtn" class="btn-secondary tap-target">Забути токен</button>
+            </div>
+            <p class="admin-status" id="ghStatus"></p>
+          </details>
         </section>
 
         <section id="markupPanel" class="glass-card markup-panel" hidden>
@@ -93,41 +97,47 @@
         </section>
 
         <section id="metaPanel" class="glass-card settings-panel" hidden>
-          <h2>🎨 Назва й колір цього магазину (meta.json)</h2>
-          <label class="settings-field">Назва — UA<input id="metaTitleUk" type="text"></label>
-          <label class="settings-field">Назва — RU<input id="metaTitleRu" type="text"></label>
-          <label class="settings-field">Назва — EN<input id="metaTitleEn" type="text"></label>
-          <div class="markup-row">
-            <label>Акцент 1<input id="metaAccent" type="color"></label>
-            <label>Акцент 2<input id="metaAccent2" type="color"></label>
-          </div>
-          <div class="markup-row">
-            <button id="metaSaveBtn" class="btn-primary tap-target">💾 Зберегти локально</button>
-            <button id="metaGhSaveBtn" class="btn-primary tap-target">☁️ Зберегти в GitHub</button>
-          </div>
+          <details>
+            <summary>🎨 Назва й колір цього магазину (meta.json)</summary>
+            <label class="settings-field">Назва — UA<input id="metaTitleUk" type="text"></label>
+            <label class="settings-field">Назва — RU<input id="metaTitleRu" type="text"></label>
+            <label class="settings-field">Назва — EN<input id="metaTitleEn" type="text"></label>
+            <div class="markup-row">
+              <label>Акцент 1<input id="metaAccent" type="color"></label>
+              <label>Акцент 2<input id="metaAccent2" type="color"></label>
+            </div>
+            <div class="markup-row">
+              <button id="metaSaveBtn" class="btn-primary tap-target">💾 Зберегти локально</button>
+              <button id="metaGhSaveBtn" class="btn-primary tap-target">☁️ Зберегти в GitHub</button>
+            </div>
+          </details>
         </section>
 
         <section id="availabilityPanel" class="glass-card settings-panel" hidden>
-          <h2>📣 Банер і наявність (availability.json)</h2>
-          <label class="settings-field">
-            Текст банера (порожньо = без банера)
-            <input id="availBannerInput" type="text" placeholder="Текст оголошення...">
-          </label>
-          <div id="availItemsList" class="avail-items-list"></div>
-          <div class="markup-row">
-            <button id="availSaveBtn" class="btn-primary tap-target">💾 Зберегти локально</button>
-            <button id="availGhSaveBtn" class="btn-primary tap-target">☁️ Зберегти в GitHub</button>
-          </div>
+          <details>
+            <summary>📣 Банер і наявність (availability.json)</summary>
+            <label class="settings-field">
+              Текст банера (порожньо = без банера)
+              <input id="availBannerInput" type="text" placeholder="Текст оголошення...">
+            </label>
+            <div id="availItemsList" class="avail-items-list"></div>
+            <div class="markup-row">
+              <button id="availSaveBtn" class="btn-primary tap-target">💾 Зберегти локально</button>
+              <button id="availGhSaveBtn" class="btn-primary tap-target">☁️ Зберегти в GitHub</button>
+            </div>
+          </details>
         </section>
 
         <section id="pricingPanel" class="glass-card settings-panel" hidden>
-          <h2>🧮 Формула цін конфігуратора (Прокси/pricing.json)</h2>
-          <p class="admin-sub">$ за 1 день на 1 IP. Загальна ціна = (база мережі × множник IP-версії + надбавки) × дні × кількість.</p>
-          <div id="pricingFields" class="pricing-fields"></div>
-          <div class="markup-row">
-            <button id="pricingSaveBtn" class="btn-primary tap-target">💾 Зберегти локально</button>
-            <button id="pricingGhSaveBtn" class="btn-primary tap-target">☁️ Зберегти в GitHub</button>
-          </div>
+          <details>
+            <summary>🧮 Формула цін конфігуратора (Прокси/pricing.json)</summary>
+            <p class="admin-sub">$ за 1 день на 1 IP. Загальна ціна = (база мережі × множник IP-версії + надбавки) × дні × кількість.</p>
+            <div id="pricingFields" class="pricing-fields"></div>
+            <div class="markup-row">
+              <button id="pricingSaveBtn" class="btn-primary tap-target">💾 Зберегти локально</button>
+              <button id="pricingGhSaveBtn" class="btn-primary tap-target">☁️ Зберегти в GitHub</button>
+            </div>
+          </details>
         </section>
 
         <section id="itemsTable" class="items-table"></section>
