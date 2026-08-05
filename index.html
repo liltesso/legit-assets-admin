@@ -128,6 +128,14 @@
               Текст банера (порожньо = без банера)
               <input id="availBannerInput" type="text" placeholder="Текст оголошення...">
             </label>
+            <label class="settings-field">
+              Іконка банера-оголошення (емодзі-фолбек, або обери преміум-стікер кнопкою ✨)
+              <div class="markup-row">
+                <input id="availBannerIcon" type="text" placeholder="📣" style="max-width:120px">
+                <button id="availBannerStickerBtn" class="btn-secondary tap-target" type="button">✨ Обрати преміум-стікер</button>
+                <button id="availBannerStickerClear" class="btn-secondary tap-target" type="button" title="Прибрати стікер">✕</button>
+              </div>
+            </label>
             <div id="availItemsList" class="avail-items-list"></div>
             <div class="markup-row">
               <button id="availSaveBtn" class="btn-primary tap-target">💾 Зберегти локально</button>

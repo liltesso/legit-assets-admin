@@ -642,7 +642,14 @@
   // ---- Banner + stock (availability.json) ----------------------------------
   const availabilityPanel = el('availabilityPanel');
   const availBannerInput = el('availBannerInput');
+  const availBannerIcon = el('availBannerIcon');
   const availItemsList = el('availItemsList');
+  let availBannerIconImage = null;
+
+  function updateBannerStickerBtnLabel() {
+    const btn = el('availBannerStickerBtn');
+    if (btn) btn.textContent = availBannerIconImage ? '✨ Преміум-стікер обрано (клікни, щоб змінити)' : '✨ Обрати преміум-стікер';
+  }
 
   function renderAvailabilityPanel() {
     const session = sessions[activeCategory];
@@ -650,6 +657,9 @@
     const availability = session.availability || { banner: '', soldOut: [] };
     const banner = availability.banner;
     availBannerInput.value = typeof banner === 'string' ? banner : (banner ? getTextFromObj(banner) : '');
+    availBannerIcon.value = availability.bannerIcon || '';
+    availBannerIconImage = availability.bannerIconImage || null;
+    updateBannerStickerBtnLabel();
     const soldOut = new Set(availability.soldOut || []);
     availItemsList.innerHTML = session.data.items
       .map((item) => {
@@ -669,7 +679,11 @@
     const soldOut = Array.from(availItemsList.querySelectorAll('input[type="checkbox"]'))
       .filter((cb) => !cb.checked)
       .map((cb) => cb.dataset.id);
-    return { banner: availBannerInput.value.trim() || null, soldOut };
+    const out = { banner: availBannerInput.value.trim() || null, soldOut };
+    const icon = availBannerIcon.value.trim();
+    if (icon) out.bannerIcon = icon;
+    if (availBannerIconImage) out.bannerIconImage = availBannerIconImage;
+    return out;
   }
 
   el('availSaveBtn').addEventListener('click', async () => {
@@ -1154,6 +1168,14 @@
       notify('Стікер шапки обрано — не забудь зберегти', 'success');
       return;
     }
+    if (pickerTarget === 'banner') {
+      availBannerIcon.value = em.char || '';
+      availBannerIconImage = em.img || '';
+      updateBannerStickerBtnLabel();
+      closeEmojiPicker();
+      notify('Стікер банера обрано — не забудь зберегти', 'success');
+      return;
+    }
     if (expandedItemIndex === null || !activeCategory) return;
     const item = sessions[activeCategory].data.items[expandedItemIndex];
     if (!item) return;
@@ -1177,6 +1199,16 @@
     metaHeaderStickerImage = null;
     updateHeaderStickerBtnLabel();
     notify('Стікер шапки прибрано — не забудь зберегти', 'success');
+  });
+
+  const availBannerStickerBtn = el('availBannerStickerBtn');
+  const availBannerStickerClear = el('availBannerStickerClear');
+  if (availBannerStickerBtn) availBannerStickerBtn.addEventListener('click', () => openEmojiPickerFor('banner'));
+  if (availBannerStickerClear) availBannerStickerClear.addEventListener('click', () => {
+    availBannerIcon.value = '';
+    availBannerIconImage = null;
+    updateBannerStickerBtnLabel();
+    notify('Стікер банера прибрано — не забудь зберегти', 'success');
   });
 
   loadGhConfigIntoForm();
