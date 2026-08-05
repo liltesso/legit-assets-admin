@@ -1065,6 +1065,76 @@
     }
   });
 
+  // ── Преміум-емодзі picker (той самий UX, що й у TG Bot Designer/studio.html):
+  // ✨ кнопка внизу праворуч відкриває сітку стікерів із premium_emoji.js,
+  // клік записує і текстовий фолбек (item.flag), і реальну картинку
+  // (item.flagImage — те, що сайт покаже фоном картки) у поточний
+  // розгорнутий (⚙-open) товар. ──
+  const emojiFab = el('emojiFab');
+  const emojiPicker = el('emojiPicker');
+  const epGrid = el('epGrid');
+  const epSearch = el('epSearch');
+  const epCloseBtn = el('epCloseBtn');
+
+  function toggleEmojiPicker() {
+    if (!emojiPicker) return;
+    if (emojiPicker.classList.contains('open')) {
+      closeEmojiPicker();
+      return;
+    }
+    if (expandedItemIndex === null) {
+      notify('Спочатку відкрий ⚙ у товарі, для якого обираєш стікер', 'error');
+      return;
+    }
+    emojiPicker.classList.add('open');
+    renderEmojiPicker('');
+    if (epSearch) {
+      epSearch.value = '';
+      setTimeout(() => epSearch.focus(), 50);
+    }
+  }
+
+  function closeEmojiPicker() {
+    if (emojiPicker) emojiPicker.classList.remove('open');
+  }
+
+  function renderEmojiPicker(q) {
+    if (!epGrid) return;
+    const list = (typeof PREMIUM_EMOJIS !== 'undefined' && PREMIUM_EMOJIS) ? PREMIUM_EMOJIS : [];
+    q = (q || '').toLowerCase().trim();
+    const filt = q ? list.filter((e) => (e.char || '').toLowerCase().includes(q) || (e.id || '').includes(q)) : list;
+    if (!filt.length) {
+      epGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#8e8e93;font-size:11px;padding:16px">Нічого не знайдено</div>';
+      return;
+    }
+    const limit = Math.min(filt.length, 240);
+    let html = '';
+    for (let i = 0; i < limit; i++) {
+      const em = filt[i];
+      html += `<div class="ep-item" title="${em.char || ''}" data-idx="${i}"><img src="${em.img}" loading="lazy"></div>`;
+    }
+    epGrid.innerHTML = html;
+    epGrid.querySelectorAll('.ep-item').forEach((node) => {
+      node.addEventListener('click', () => applyPremiumSticker(filt[parseInt(node.dataset.idx, 10)]));
+    });
+  }
+
+  function applyPremiumSticker(em) {
+    if (!em || expandedItemIndex === null || !activeCategory) return;
+    const item = sessions[activeCategory].data.items[expandedItemIndex];
+    if (!item) return;
+    item.flag = em.char || '';
+    item.flagImage = em.img || '';
+    markDirty();
+    closeEmojiPicker();
+    renderItems();
+    notify('Стікер застосовано — не забудь зберегти', 'success');
+  }
+
+  if (emojiFab) emojiFab.addEventListener('click', toggleEmojiPicker);
+  if (epCloseBtn) epCloseBtn.addEventListener('click', closeEmojiPicker);
+  if (epSearch) epSearch.addEventListener('input', () => renderEmojiPicker(epSearch.value));
+
   loadGhConfigIntoForm();
   restoreHandles();
 })();

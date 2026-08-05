@@ -147,7 +147,20 @@
     </div>
   </div>
 
+  <!-- ══════════ PREMIUM EMOJI PICKER (той самий, що й у TG Bot Designer) ══════════ -->
+  <button class="emoji-fab" id="emojiFab" title="Преміум-стікер для прапора товару">✨</button>
+  <div class="emoji-picker" id="emojiPicker">
+    <div class="ep-head">
+      <span class="ep-title">✨ Преміум-стікер (фон картки)</span>
+      <button class="ep-close" id="epCloseBtn">✕</button>
+    </div>
+    <input class="ep-search" placeholder="🔍 Пошук..." id="epSearch">
+    <div class="ep-hint">Спершу відкрий ⚙ у потрібному товарі, потім обери стікер.</div>
+    <div class="ep-grid" id="epGrid"></div>
+  </div>
+
   <script src="https://liltesso.github.io/legit-assets-shared/github-api.js"></script>
+  <script src="premium_emoji.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
