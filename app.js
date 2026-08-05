@@ -46,6 +46,7 @@
   const fallbackFileInput = el('fallbackFileInput');
 
   let selectedItemIndex = null;
+  let expandedItemIndex = null;
   let pendingFallbackCategory = null; // category key waiting on the file <input>
 
   function setStatus(msg) {
@@ -829,9 +830,24 @@
           <button class="move-btn" data-dir="1" ${index === items.length - 1 ? 'disabled' : ''}>↓</button>
         </div>
         <div class="col-del">
+          <button class="extra-toggle-btn" title="Додаткові поля (прапор/бейджі/спосіб видачі)">⚙</button>
           <button class="dup-btn" title="Дублювати">⧉</button>
           <button class="del-btn" title="Видалити">✕</button>
         </div>
+      `;
+
+      const extraRow = document.createElement('div');
+      extraRow.className = 'item-extra-row glass-card' + (expandedItemIndex === index ? '' : ' collapsed');
+      extraRow.innerHTML = `
+        <label>Прапор (фон картки)<input type="text" value="${item.flag || ''}" data-xfield="flag" maxlength="8" placeholder="🇺🇦"></label>
+        <label>Бейдж — ранг (${editLang})<input type="text" value="${getText(item, 'badgeRank')}" data-xfield="badgeRank" placeholder="Trust: High"></label>
+        <label>Бейдж — рік/відлежка (${editLang})<input type="text" value="${getText(item, 'badgeYear')}" data-xfield="badgeYear" placeholder="Створено: 2021"></label>
+        <label>Спосіб видачі (тільки verify)
+          <select data-xfield="deliveryType">
+            <option value="" ${!item.deliveryType ? 'selected' : ''}>Звичайний (пошта+пароль)</option>
+            <option value="fragment" ${item.deliveryType === 'fragment' ? 'selected' : ''}>Fragment (телефон+код)</option>
+          </select>
+        </label>
       `;
 
       row.addEventListener('click', (ev) => {
@@ -889,7 +905,31 @@
         renderCategory();
       });
 
+      row.querySelector('.extra-toggle-btn').addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        expandedItemIndex = expandedItemIndex === index ? null : index;
+        renderItems();
+      });
+
+      extraRow.querySelectorAll('[data-xfield]').forEach((input) => {
+        const handler = () => {
+          const field = input.dataset.xfield;
+          if (field === 'badgeRank' || field === 'badgeYear') {
+            setText(item, field, input.value);
+          } else if (field === 'deliveryType') {
+            if (input.value) item.deliveryType = input.value;
+            else delete item.deliveryType;
+          } else {
+            item[field] = input.value;
+          }
+          markDirty();
+        };
+        input.addEventListener('input', handler);
+        input.addEventListener('change', handler);
+      });
+
       itemsTable.appendChild(row);
+      itemsTable.appendChild(extraRow);
     });
   }
 

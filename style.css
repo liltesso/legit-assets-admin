@@ -381,6 +381,11 @@
   gap: 2px;
 }
 
+.col-del {
+  display: flex;
+  gap: 4px;
+}
+
 .move-btn,
 .del-btn,
 .dup-btn {
@@ -404,6 +409,55 @@
 .del-btn {
   background: rgba(239, 68, 68, 0.15);
   color: #f87171;
+}
+
+.extra-toggle-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-weight: 700;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--fg);
+}
+
+/* Прапор/бейджі/спосіб видачі — опційні поля товару, приховані за замовчуванням,
+   розкриваються кнопкою ⚙ на рядку товару. */
+.item-extra-row {
+  padding: 12px 16px;
+  margin-top: -6px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.item-extra-row.collapsed {
+  display: none;
+}
+
+.item-extra-row label {
+  font-size: 11px;
+  color: var(--fg-dim);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item-extra-row input,
+.item-extra-row select {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  color: var(--fg);
+  font-size: 13px;
+}
+
+@media (max-width: 760px) {
+  .item-extra-row {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .add-item-btn {
