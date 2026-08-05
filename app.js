@@ -547,6 +547,13 @@
   const metaTitleEn = el('metaTitleEn');
   const metaAccent = el('metaAccent');
   const metaAccent2 = el('metaAccent2');
+  const metaHeaderEmoji = el('metaHeaderEmoji');
+  let metaHeaderStickerImage = null;
+
+  function updateHeaderStickerBtnLabel() {
+    const btn = el('metaHeaderStickerBtn');
+    if (btn) btn.textContent = metaHeaderStickerImage ? '✨ Преміум-стікер обрано (клікни, щоб змінити)' : '✨ Обрати преміум-стікер';
+  }
 
   function renderMetaPanel() {
     const cat = CATEGORIES.find((c) => c.key === activeCategory);
@@ -559,15 +566,22 @@
     metaTitleEn.value = title.en || cat.label;
     metaAccent.value = meta.accent || cat.accent;
     metaAccent2.value = meta.accent2 || cat.accent;
+    metaHeaderEmoji.value = meta.headerEmoji || '';
+    metaHeaderStickerImage = meta.headerStickerImage || null;
+    updateHeaderStickerBtnLabel();
   }
 
   function buildMetaFromForm() {
-    return {
+    const out = {
       siteTitle: { uk: metaTitleUk.value.trim(), ru: metaTitleRu.value.trim(), en: metaTitleEn.value.trim() },
       accent: metaAccent.value,
       accent2: metaAccent2.value,
       accentGlow: hexToGlow(metaAccent.value),
     };
+    const emoji = metaHeaderEmoji.value.trim();
+    if (emoji) out.headerEmoji = emoji;
+    if (metaHeaderStickerImage) out.headerStickerImage = metaHeaderStickerImage;
+    return out;
   }
 
   function hexToGlow(hex) {
@@ -1076,22 +1090,33 @@
   const epSearch = el('epSearch');
   const epCloseBtn = el('epCloseBtn');
 
-  function toggleEmojiPicker() {
+  // pickerTarget визначає, куди піде обраний стікер: картка товару
+  // (той самий фон-прапор, що й раніше) чи великий стікер у шапці сайту
+  // (meta.json → headerStickerImage). Обидва використовують один picker.
+  let pickerTarget = 'item';
+
+  function openEmojiPickerFor(target) {
     if (!emojiPicker) return;
-    if (emojiPicker.classList.contains('open')) {
-      closeEmojiPicker();
-      return;
-    }
-    if (expandedItemIndex === null) {
+    if (target === 'item' && expandedItemIndex === null) {
       notify('Спочатку відкрий ⚙ у товарі, для якого обираєш стікер', 'error');
       return;
     }
+    pickerTarget = target;
     emojiPicker.classList.add('open');
     renderEmojiPicker('');
     if (epSearch) {
       epSearch.value = '';
       setTimeout(() => epSearch.focus(), 50);
     }
+  }
+
+  function toggleEmojiPicker() {
+    if (!emojiPicker) return;
+    if (emojiPicker.classList.contains('open') && pickerTarget === 'item') {
+      closeEmojiPicker();
+      return;
+    }
+    openEmojiPickerFor('item');
   }
 
   function closeEmojiPicker() {
@@ -1120,7 +1145,16 @@
   }
 
   function applyPremiumSticker(em) {
-    if (!em || expandedItemIndex === null || !activeCategory) return;
+    if (!em) return;
+    if (pickerTarget === 'header') {
+      metaHeaderEmoji.value = em.char || '';
+      metaHeaderStickerImage = em.img || '';
+      updateHeaderStickerBtnLabel();
+      closeEmojiPicker();
+      notify('Стікер шапки обрано — не забудь зберегти', 'success');
+      return;
+    }
+    if (expandedItemIndex === null || !activeCategory) return;
     const item = sessions[activeCategory].data.items[expandedItemIndex];
     if (!item) return;
     item.flag = em.char || '';
@@ -1134,6 +1168,16 @@
   if (emojiFab) emojiFab.addEventListener('click', toggleEmojiPicker);
   if (epCloseBtn) epCloseBtn.addEventListener('click', closeEmojiPicker);
   if (epSearch) epSearch.addEventListener('input', () => renderEmojiPicker(epSearch.value));
+
+  const metaHeaderStickerBtn = el('metaHeaderStickerBtn');
+  const metaHeaderStickerClear = el('metaHeaderStickerClear');
+  if (metaHeaderStickerBtn) metaHeaderStickerBtn.addEventListener('click', () => openEmojiPickerFor('header'));
+  if (metaHeaderStickerClear) metaHeaderStickerClear.addEventListener('click', () => {
+    metaHeaderEmoji.value = '';
+    metaHeaderStickerImage = null;
+    updateHeaderStickerBtnLabel();
+    notify('Стікер шапки прибрано — не забудь зберегти', 'success');
+  });
 
   loadGhConfigIntoForm();
   restoreHandles();
