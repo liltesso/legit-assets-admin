@@ -1129,6 +1129,12 @@
   // клік записує і текстовий фолбек (item.flag), і реальну картинку
   // (item.flagImage — те, що сайт покаже фоном картки) у поточний
   // розгорнутий (⚙-open) товар. ──
+  let customEmojiList = [];
+  fetch('premium_emoji_custom.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : []))
+    .then((data) => { customEmojiList = Array.isArray(data) ? data : []; })
+    .catch(() => { customEmojiList = []; });
+
   const emojiFab = el('emojiFab');
   const emojiPicker = el('emojiPicker');
   const epGrid = el('epGrid');
@@ -1170,7 +1176,10 @@
 
   function renderEmojiPicker(q) {
     if (!epGrid) return;
-    const list = (typeof PREMIUM_EMOJIS !== 'undefined' && PREMIUM_EMOJIS) ? PREMIUM_EMOJIS : [];
+    const base = (typeof PREMIUM_EMOJIS !== 'undefined' && PREMIUM_EMOJIS) ? PREMIUM_EMOJIS : [];
+    // Кастомні паки, додані через /addemoji в боті (premium_emoji_custom.json),
+    // йдуть ПЕРШИМИ — це те, що адмін щойно сам додав, найімовірніше й шукає.
+    const list = customEmojiList.length ? customEmojiList.concat(base) : base;
     q = (q || '').toLowerCase().trim();
     const filt = q ? list.filter((e) => (e.char || '').toLowerCase().includes(q) || (e.id || '').includes(q)) : list;
     if (!filt.length) {
