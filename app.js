@@ -549,6 +549,7 @@
   const metaAccent2 = el('metaAccent2');
   const metaHeaderEmoji = el('metaHeaderEmoji');
   let metaHeaderStickerImage = null;
+  let metaHeaderStickerVideo = null;
 
   function updateHeaderStickerBtnLabel() {
     const btn = el('metaHeaderStickerBtn');
@@ -568,6 +569,7 @@
     metaAccent2.value = meta.accent2 || cat.accent;
     metaHeaderEmoji.value = meta.headerEmoji || '';
     metaHeaderStickerImage = meta.headerStickerImage || null;
+    metaHeaderStickerVideo = meta.headerStickerVideo || null;
     updateHeaderStickerBtnLabel();
   }
 
@@ -581,6 +583,7 @@
     const emoji = metaHeaderEmoji.value.trim();
     if (emoji) out.headerEmoji = emoji;
     if (metaHeaderStickerImage) out.headerStickerImage = metaHeaderStickerImage;
+    if (metaHeaderStickerVideo) out.headerStickerVideo = metaHeaderStickerVideo;
     return out;
   }
 
@@ -645,6 +648,7 @@
   const availBannerIcon = el('availBannerIcon');
   const availItemsList = el('availItemsList');
   let availBannerIconImage = null;
+  let availBannerIconVideo = null;
 
   function updateBannerStickerBtnLabel() {
     const btn = el('availBannerStickerBtn');
@@ -659,6 +663,7 @@
     availBannerInput.value = typeof banner === 'string' ? banner : (banner ? getTextFromObj(banner) : '');
     availBannerIcon.value = availability.bannerIcon || '';
     availBannerIconImage = availability.bannerIconImage || null;
+    availBannerIconVideo = availability.bannerIconVideo || null;
     updateBannerStickerBtnLabel();
     const soldOut = new Set(availability.soldOut || []);
     availItemsList.innerHTML = session.data.items
@@ -683,6 +688,7 @@
     const icon = availBannerIcon.value.trim();
     if (icon) out.bannerIcon = icon;
     if (availBannerIconImage) out.bannerIconImage = availBannerIconImage;
+    if (availBannerIconVideo) out.bannerIconVideo = availBannerIconVideo;
     return out;
   }
 
@@ -1190,7 +1196,10 @@
     let html = '';
     for (let i = 0; i < limit; i++) {
       const em = filt[i];
-      html += `<div class="ep-item" title="${em.char || ''}" data-idx="${i}"><img src="${em.img}" loading="lazy"></div>`;
+      const media = em.video
+        ? `<video src="${em.video}" autoplay loop muted playsinline></video>`
+        : `<img src="${em.img}" loading="lazy">`;
+      html += `<div class="ep-item" title="${em.char || ''}" data-idx="${i}">${media}</div>`;
     }
     epGrid.innerHTML = html;
     epGrid.querySelectorAll('.ep-item').forEach((node) => {
@@ -1203,6 +1212,7 @@
     if (pickerTarget === 'header') {
       metaHeaderEmoji.value = em.char || '';
       metaHeaderStickerImage = em.img || '';
+      metaHeaderStickerVideo = em.video || null;
       updateHeaderStickerBtnLabel();
       closeEmojiPicker();
       notify('Стікер шапки обрано — не забудь зберегти', 'success');
@@ -1211,6 +1221,7 @@
     if (pickerTarget === 'banner') {
       availBannerIcon.value = em.char || '';
       availBannerIconImage = em.img || '';
+      availBannerIconVideo = em.video || null;
       updateBannerStickerBtnLabel();
       closeEmojiPicker();
       notify('Стікер банера обрано — не забудь зберегти', 'success');
@@ -1222,6 +1233,7 @@
     if (pickerTarget === 'itemEmoji') {
       item.emoji = em.char || '';
       item.emojiImage = em.img || '';
+      if (em.video) item.emojiVideo = em.video; else delete item.emojiVideo;
       markDirty();
       closeEmojiPicker();
       renderItems();
@@ -1230,6 +1242,7 @@
     }
     item.flag = em.char || '';
     item.flagImage = em.img || '';
+    if (em.video) item.flagVideo = em.video; else delete item.flagVideo;
     markDirty();
     closeEmojiPicker();
     renderItems();
@@ -1246,6 +1259,7 @@
   if (metaHeaderStickerClear) metaHeaderStickerClear.addEventListener('click', () => {
     metaHeaderEmoji.value = '';
     metaHeaderStickerImage = null;
+    metaHeaderStickerVideo = null;
     updateHeaderStickerBtnLabel();
     notify('Стікер шапки прибрано — не забудь зберегти', 'success');
   });
@@ -1256,6 +1270,7 @@
   if (availBannerStickerClear) availBannerStickerClear.addEventListener('click', () => {
     availBannerIcon.value = '';
     availBannerIconImage = null;
+    availBannerIconVideo = null;
     updateBannerStickerBtnLabel();
     notify('Стікер банера прибрано — не забудь зберегти', 'success');
   });
