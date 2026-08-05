@@ -867,7 +867,12 @@
       const extraRow = document.createElement('div');
       extraRow.className = 'item-extra-row glass-card' + (expandedItemIndex === index ? '' : ' collapsed');
       extraRow.innerHTML = `
-        <label>Прапор (фон картки)<input type="text" value="${item.flag || ''}" data-xfield="flag" maxlength="8" placeholder="🇺🇦"></label>
+        <label>Прапор (фон картки)
+          <div class="markup-row">
+            <input type="text" value="${item.flag || ''}" data-xfield="flag" maxlength="8" placeholder="🇺🇦">
+            <button class="btn-secondary tap-target item-flag-sticker-btn" type="button" title="Обрати преміум-стікер">✨</button>
+          </div>
+        </label>
         <label>Бейдж — ранг (${editLang})<input type="text" value="${getText(item, 'badgeRank')}" data-xfield="badgeRank" placeholder="Trust: High"></label>
         <label>Бейдж — рік/відлежка (${editLang})<input type="text" value="${getText(item, 'badgeYear')}" data-xfield="badgeYear" placeholder="Створено: 2021"></label>
         <label>Спосіб видачі (тільки verify)
@@ -938,6 +943,18 @@
         expandedItemIndex = expandedItemIndex === index ? null : index;
         renderItems();
       });
+
+      // Кнопка ✨ прямо біля поля — рядок видно лише коли товар уже
+      // розгорнутий (⚙), тож expandedItemIndex===index тут завжди істинний,
+      // жодного окремого кроку "спочатку відкрий ⚙" більше не потрібно.
+      const itemFlagStickerBtn = extraRow.querySelector('.item-flag-sticker-btn');
+      if (itemFlagStickerBtn) {
+        itemFlagStickerBtn.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          expandedItemIndex = index;
+          openEmojiPickerFor('item');
+        });
+      }
 
       extraRow.querySelectorAll('[data-xfield]').forEach((input) => {
         const handler = () => {
